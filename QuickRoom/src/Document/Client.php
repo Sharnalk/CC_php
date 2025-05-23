@@ -2,11 +2,17 @@
 
 namespace App\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 #[ODM\Document]
 class Client
 {
+    public function __construct()
+    {
+        $this->reservations = new ArrayCollection();
+    }
     #[ODM\Id]
     private string $id;
 
@@ -17,5 +23,48 @@ class Client
     private string $adresse;
 
     #[ODM\ReferenceMany(targetDocument: Reservation::class, mappedBy: 'client')]
-    private $reservations;
+    private Collection $reservations;
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function setId(string $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function getNom(): string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): void
+    {
+        $this->nom = $nom;
+    }
+
+    public function getAdresse(): string
+    {
+        return $this->adresse;
+    }
+
+    public function setAdresse(string $adresse): void
+    {
+        $this->adresse = $adresse;
+    }
+
+    public function getReservations(): Collection
+    {
+        return $this->reservations;
+    }
+
+    public function setReservations(Collection $reservations): void
+    {
+        $this->reservations = $reservations;
+    }
+
+
+
 }
