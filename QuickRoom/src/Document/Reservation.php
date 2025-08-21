@@ -2,120 +2,83 @@
 
 namespace App\Document;
 
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
-use Symfony\Component\Uid\Uuid;
 
-#[ODM\Document]
+#[ODM\Document(repositoryClass: \App\Repository\ReservationRepository::class)]
+#[ODM\UniqueIndex(keys: ['numReservation' => 1])]
+#[ODM\Index(keys: ['hotel' => 1, 'dateDebut' => 1, 'dateFin' => 1])]
 class Reservation
 {
-
-    public function __construct()
-    {
-        $this->chambres = new ArrayCollection();
-        $this->numReservation = Uuid::v4();
-    }
     #[ODM\Id]
-    private string $id;
-
-    #[ODM\Field(type: 'date')]
-    private \DateTime $dateDebut;
-
-    #[ODM\Field(type: 'date')]
-    private \DateTime $dateFin;
-
-    #[ODM\ReferenceOne(targetDocument: Client::class, inversedBy: 'reservations')]
-    private Client $client;
-
-    #[ODM\ReferenceOne(targetDocument: Hotel::class)]
-    private Hotel $hotel;
-
-    #[ODM\ReferenceMany(targetDocument: Chambre::class)]
-    private Collection $chambres;
-
-    #[ODM\Field(type: 'string', nullable: true)]
-    private ?string $commentaire = null;
+    private ?string $id = null;
 
     #[ODM\Field(type: 'string')]
-    private string $numReservation;
+    private string $numReservation; // lisible + unique
 
-    public function getNumReservation(): string
-    {
-        return $this->numReservation;
-    }
+    #[ODM\ReferenceOne(targetDocument: Client::class, storeAs: 'dbRefWithDb')]
+    private Client $client;
 
-    public function getCommentaire(): ?string
-    {
-        return $this->commentaire;
-    }
+    #[ODM\ReferenceOne(targetDocument: Hotel::class, storeAs: 'dbRefWithDb')]
+    private Hotel $hotel;
 
-    public function setCommentaire(?string $commentaire): void
-    {
-        $this->commentaire = $commentaire;
-    }
+    /** @var Collection<int, Chambre> */
+    #[ODM\ReferenceMany(targetDocument: Chambre::class, storeAs: 'dbRefWithDb')]
+    private Collection $chambres;
+    #[ODM\Field(type: 'date_immutable')]
+    private \DateTimeImmutable $dateDebut;
 
-    public function getId(): string
-    {
-        return $this->id;
-    }
+    #[ODM\Field(type: 'date_immutable')]
+    private \DateTimeImmutable $dateFin;
 
-    public function setId(string $id): void
-    {
-        $this->id = $id;
-    }
+    #[ODM\Field(type: 'string', nullable: true)]
+    private ?string $commentaireClient = null;
 
-    public function getDateDebut(): \DateTime
-    {
-        return $this->dateDebut;
-    }
+    #[ODM\Field(type: 'string')]
+    private string $statut = 'CONFIRMED'; // PENDING|CONFIRMED|CANCELLED ...
 
-    public function setDateDebut(\DateTime $dateDebut): void
-    {
-        $this->dateDebut = $dateDebut;
-    }
-
-    public function getDateFin(): \DateTime
-    {
-        return $this->dateFin;
-    }
-
-    public function setDateFin(\DateTime $dateFin): void
-    {
-        $this->dateFin = $dateFin;
-    }
-
-    public function getClient(): Client
-    {
-        return $this->client;
-    }
-
-    public function setClient(Client $client): void
-    {
+    public function __construct(
+        string $numReservation,
+        Client $client,
+        Hotel $hotel,
+        array $chambres,
+        \DateTimeImmutable $dateDebut,
+        \DateTimeImmutable $dateFin,
+        ?string $commentaireClient = null
+    ) {
+        $this->numReservation = $numReservation;
         $this->client = $client;
-    }
-
-    public function getHotel(): Hotel
-    {
-        return $this->hotel;
-    }
-
-    public function setHotel(Hotel $hotel): void
-    {
         $this->hotel = $hotel;
+        $this->chambres = new ArrayCollection($chambres);
+        $this->dateDebut = $dateDebut;
+        $this->dateFin = $dateFin;
+        $this->commentaireClient = $commentaireClient;
     }
 
-    public function getChambres(): Collection
+    public function getId(): ?string { return $this->id; }
+    public function getNumReservation(): string { return $this->numReservation; }
+    public function getClient(): Client { return $this->client; }
+    public function getHotel(): Hotel { return $this->hotel; }
+    /** @return Collection<int, Chambre> */
+    public function getChambres(): Collection { return $this->chambres; }
+    public function addChambre(Chambre $c): self
     {
-        return $this->chambres;
+        if (!$this->chambres->contains($c)) {
+            $this->chambres->add($c);
+        }
+        return $this;
     }
 
-    public function setChambres(Collection $chambres): void
+    public function removeChambre(Chambre $c): self
     {
-        $this->chambres = $chambres;
+        $this->chambres->removeElement($c);
+        return $this;
     }
-
-
-
-
+    public function getDateDebut(): \DateTimeImmutable { return $this->dateDebut; }
+    public function getDateFin(): \DateTimeImmutable { return $this->dateFin; }
+    public function getCommentaireClient(): ?string { return $this->commentaireClient; }
+    public function setCommentaireClient(?string $c): self { $this->commentaireClient = $c; return $this; }
+    public function getStatut(): string { return $this->statut; }
+    public function setStatut(string $s): self { $this->statut = $s; return $this; }
 }

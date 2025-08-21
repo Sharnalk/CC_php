@@ -2,83 +2,49 @@
 
 namespace App\Document;
 
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 #[ODM\Document]
+#[ODM\Index(keys: ['nom' => 1])]
+#[ODM\Index(keys: ['categorie' => 1])]
 class Hotel
 {
-    public function __construct()
-    {
-        $this->chambres = new ArrayCollection();
-    }
     #[ODM\Id]
-    private string $id;
+    private ?string $id = null;
 
     #[ODM\Field(type: 'string')]
     private string $nom;
 
-    #[ODM\Field(type: 'string')]
-    private string $adresse;
+    #[ODM\Field(type: 'string', nullable: true)]
+    private ?string $categorie = null; // "*", "**", "***", ...
 
-    #[ODM\Field(type: 'string')]
-    private string $categorie;
+    #[ODM\Field(type: 'string', nullable: true)]
+    private ?string $ville = null;
 
+    /** @var Collection<int, Chambre> */
     #[ODM\ReferenceMany(targetDocument: Chambre::class, mappedBy: 'hotel')]
     private Collection $chambres;
 
-    public function getId(): string
-    {
-        return $this->id;
-    }
-
-    public function setId(string $id): void
-    {
-        $this->id = $id;
-    }
-
-    public function getNom(): string
-    {
-        return $this->nom;
-    }
-
-    public function setNom(string $nom): void
+    public function __construct(string $nom, ?string $categorie = null, ?string $ville = null)
     {
         $this->nom = $nom;
-    }
-
-    public function getAdresse(): string
-    {
-        return $this->adresse;
-    }
-
-    public function setAdresse(string $adresse): void
-    {
-        $this->adresse = $adresse;
-    }
-
-    public function getCategorie(): string
-    {
-        return $this->categorie;
-    }
-
-    public function setCategorie(string $categorie): void
-    {
         $this->categorie = $categorie;
+        $this->ville = $ville;
+        $this->chambres = new ArrayCollection();
     }
 
+    public function getId(): ?string { return $this->id; }
+    public function getNom(): string { return $this->nom; }
+    public function setNom(string $nom): self { $this->nom = $nom; return $this; }
+    public function getCategorie(): ?string { return $this->categorie; }
+    public function setCategorie(?string $categorie): self { $this->categorie = $categorie; return $this; }
+    public function getVille(): ?string { return $this->ville; }
+    public function setVille(?string $ville): self { $this->ville = $ville; return $this; }
+    /** @return Collection<int, Chambre> */
     public function getChambres(): Collection
     {
         return $this->chambres;
     }
-
-    public function setChambres(Collection $chambres): void
-    {
-        $this->chambres = $chambres;
-    }
-
-
-
-
 }

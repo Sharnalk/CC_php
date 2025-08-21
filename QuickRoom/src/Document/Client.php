@@ -2,69 +2,42 @@
 
 namespace App\Document;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 #[ODM\Document]
+#[ODM\UniqueIndex(keys: ['email' => 1])]
 class Client
 {
-    public function __construct()
-    {
-        $this->reservations = new ArrayCollection();
-    }
     #[ODM\Id]
-    private string $id;
+    private ?string $id = null;
 
     #[ODM\Field(type: 'string')]
-    private string $nom;
+    private string $email;
 
     #[ODM\Field(type: 'string')]
-    private string $adresse;
+    private string $passwordHash;
 
-    #[ODM\ReferenceMany(targetDocument: Reservation::class, mappedBy: 'client')]
-    private Collection $reservations;
+    #[ODM\Field(type: 'string', nullable: true)]
+    private ?string $nom = null;
 
-    public function getId(): string
+    #[ODM\Field(type: 'string', nullable: true)]
+    private ?string $prenom = null;
+
+    public function __construct(string $email, string $passwordHash, ?string $nom = null, ?string $prenom = null)
     {
-        return $this->id;
-    }
-
-    public function setId(string $id): void
-    {
-        $this->id = $id;
-    }
-
-    public function getNom(): string
-    {
-        return $this->nom;
-    }
-
-    public function setNom(string $nom): void
-    {
+        $this->email = $email;
+        $this->passwordHash = $passwordHash;
         $this->nom = $nom;
+        $this->prenom = $prenom;
     }
 
-    public function getAdresse(): string
-    {
-        return $this->adresse;
-    }
-
-    public function setAdresse(string $adresse): void
-    {
-        $this->adresse = $adresse;
-    }
-
-    public function getReservations(): Collection
-    {
-        return $this->reservations;
-    }
-
-    public function setReservations(Collection $reservations): void
-    {
-        $this->reservations = $reservations;
-    }
-
-
-
+    public function getId(): ?string { return $this->id; }
+    public function getEmail(): string { return $this->email; }
+    public function setEmail(string $email): self { $this->email = $email; return $this; }
+    public function getPasswordHash(): string { return $this->passwordHash; }
+    public function setPasswordHash(string $hash): self { $this->passwordHash = $hash; return $this; }
+    public function getNom(): ?string { return $this->nom; }
+    public function setNom(?string $nom): self { $this->nom = $nom; return $this; }
+    public function getPrenom(): ?string { return $this->prenom; }
+    public function setPrenom(?string $prenom): self { $this->prenom = $prenom; return $this; }
 }
