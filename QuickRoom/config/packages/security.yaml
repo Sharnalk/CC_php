@@ -1,0 +1,24 @@
+security:
+  password_hashers:
+    App\Document\Client: 'auto'
+
+  providers:
+    app_mongo_provider:
+      id: App\Security\MongoUserProvider
+
+  firewalls:
+    main:
+      lazy: true
+      provider: app_mongo_provider
+      form_login:
+        login_path: app_login
+        check_path: app_login
+        enable_csrf: true
+        default_target_path: /client/reservations
+      logout:
+        path: app_logout
+        target: /
+
+  access_control:
+    - { path: ^/admin, roles: ROLE_ADMIN }
+    - { path: ^/client, roles: ROLE_CLIENT }

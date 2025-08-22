@@ -23,6 +23,10 @@ services:
         factory: ['@doctrine_mongodb.odm.document_manager', getRepository]
         arguments: [App\Document\Reservation]
         public: false
+    App\Security\MongoUserProvider:
+        arguments:
+            $dm: '@doctrine_mongodb.odm.document_manager'
+        tags: [ 'security.user_provider' ]
 
     # === Services métier ===
     App\Service\AvailabilityService:

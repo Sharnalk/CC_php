@@ -27,6 +27,11 @@ final class ReservationService implements ReservationServiceInterface
         DateRange $dates,
         ?string $commentaireClient = null
     ): Reservation {
+
+        if (count($rooms) < 1) {
+            throw new \InvalidArgumentException('Au moins une chambre doit être réservée.');
+        }
+
         // Vérifier que toutes les chambres sont dans le bon hôtel
         foreach ($rooms as $room) {
             if ($room->getHotel()->getId() !== $hotel->getId()) {
@@ -42,10 +47,8 @@ final class ReservationService implements ReservationServiceInterface
             }
         }
 
-        // Générer un numéro unique (au pire, on tente plusieurs fois)
         $num = $this->numberGen->generate();
 
-        // Instancier & persister
         $reservation = new Reservation(
             numReservation: $num,
             client: $client,
@@ -57,8 +60,9 @@ final class ReservationService implements ReservationServiceInterface
         );
 
         $this->dm->persist($reservation);
-        $this->dm->flush(); // NOTE: pour de vraies transactions, il faut un cluster répliqué Mongo (transactions multi-doc)
+        $this->dm->flush();
 
         return $reservation;
     }
+
 }
