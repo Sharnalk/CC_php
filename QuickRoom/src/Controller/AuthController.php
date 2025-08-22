@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 final class AuthController extends AbstractController
 {
     // Form_login se branche sur cette route (GET pour afficher, POST pour soumettre).
-    #[Route(path: '/login', name: 'app_login', methods: ['GET'])]
+    #[Route(path: '/login', name: 'app_login', methods: ['GET','POST'])]
     public function login(): Response
     {
         // Back only: renvoie juste un 200 pour dire "route OK".

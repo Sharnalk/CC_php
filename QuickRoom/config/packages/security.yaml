@@ -13,7 +13,9 @@ security:
       form_login:
         login_path: app_login
         check_path: app_login
-        enable_csrf: true
+        enable_csrf: false            # pratique pour Postman en dev
+        username_parameter: email     # tu postes "email"
+        password_parameter: password  # tu postes "password"
         default_target_path: /client/reservations
       logout:
         path: app_logout
