@@ -50,3 +50,28 @@
 
 # Embedded web-server pid file
 /.web-server-pid
+
+# ==== Symfony child project QuickRoom ====
+# cache / logs
+QuickRoom/var/
+QuickRoom/public/bundles/
+
+# dépendances et builds
+QuickRoom/vendor/
+QuickRoom/node_modules/
+QuickRoom/public/build/
+
+# secrets & env locaux
+QuickRoom/.env.local
+QuickRoom/.env.*.local
+QuickRoom/secrets/
+
+# PHPUnit result cache
+QuickRoom/.phpunit.result.cache
+
+# IDE / système
+QuickRoom/.idea/
+QuickRoom/.vscode/
+QuickRoom/.DS_Store
+QuickRoom/public/assets/
+QuickRoom/assets/vendor/

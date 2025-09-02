@@ -3,3 +3,13 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+    
+root_redirect:
+    path: /
+    # Symfony appelle ce controller builtin pour renvoyer une redirection
+    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction
+    defaults:
+        # vers /home
+        path: /home
+        # true = 301 Permanent, false = 302 Temporarary
+        permanent: false
